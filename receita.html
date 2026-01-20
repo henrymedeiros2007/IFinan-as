@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Registrar Receita</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+                <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}" class="active">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="form-container">
+                <h2>Registrar receita</h2>
+                <form action="{{ url_for('receita') }}" method="post">
+                     <div class="form-row">
+                        <input type="text" name="descricao" placeholder="Descrição (Ex: Salário, Venda)" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="number" step="0.01" name="valor" placeholder="Valor" required>
+                        <input type="date" name="data" required>
+                    </div>
+                    <div class="category-group">
+                        <label>Adicione a categoria:</label>
+                        <select name="categoria" required>
+                            <option value="Salario">Salário</option>
+                            <option value="Vendas">Vendas</option>
+                            <option value="Bonus">Bônus</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-salvar-form">Salvar</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

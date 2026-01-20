@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+                <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}" class="active">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages">
+                  {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <h2>Upload extrato mensal (.OFX)</h2>
+                <p>Envie seu arquivo .OFX para importar suas transações automaticamente.</p>
+                
+
+                <form action="{{ url_for('analisar') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+                    <div class="upload-area">
+                        <label for="extratoFile" class="btn-anexar-grande">Anexar arquivo .OFX</label>
+                        
+                        <input type="file" id="extratoFile" name="extratoFile" accept=".ofx" hidden>
+                        <span id="file-name-display">nenhum arquivo anexado</span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Enviar Extrato</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('extratoFile').addEventListener('change', function() {
+            var fileName = this.files[0] ? this.files[0].name : 'nenhum arquivo anexado';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Cadastro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="split-container">
+        <div class="split-left">
+            <div class="logo-container">
+               <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo iFinanças">
+                <h1>IFinanças</h1>
+            </div>
+        </div>
+        <div class="split-right">
+            <div class="form-card">
+                <h2>Cadastro</h2>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('cadastro') }}" method="post">
+                    <div class="input-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" required>
+                    </div>
+                    <button type="submit" class="btn">Cadastrar</button>
+                </form>
+                <div class="auth-footer">
+                    <a href="{{ url_for('login') }}" class="link-cadastro">Já tem uma conta? Entre</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

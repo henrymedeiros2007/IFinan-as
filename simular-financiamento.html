@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Simular Financiamento</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Estilos para a tabela de resultados (copiado do outro simulador) */
+        .results-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f8f0; /* Um verde mais claro */
+            border-radius: 8px;
+        }
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-card h4 {
+            margin: 0 0 5px 0;
+            color: #555;
+        }
+        .summary-card p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e8b57; /* Verde escuro */
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+        .results-table th {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+        }
+        .results-table tr:nth-child(even){background-color: #f2f2f2;}
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+                <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}" class="active">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="form-container">
+                <h2>Simular financiamento</h2>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category else 'info' }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="form-row">
+                        <input type="number" name="valor_total" placeholder="Valor do bem (R$)" step="0.01" required>
+                        <input type="number" name="valor_entrada" placeholder="Valor de entrada (R$)" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="number" name="taxa_juros" placeholder="Taxa de juros (ex: 10.5) % a.a" step="0.01" required>
+                        <input type="number" name="prazo_meses" placeholder="Prazo (em meses)" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-calcular">Calcular</button>
+                        <button type="reset" class="btn-limpar">Limpar</button>
+                    </div>
+                </form>
+
+                {% if resultados %}
+                <div class="results-container">
+                    <h3>Resultado da Simulação (Tabela Price)</h3>
+                    <div class="results-summary">
+                        <div class="summary-card">
+                            <h4>Valor da Parcela</h4>
+                            <p>{{ resultados.resumo.valor_parcela|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Valor Financiado</h4>
+                            <p>{{ resultados.resumo.valor_financiado|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Total em Juros</h4>
+                            <p>{{ resultados.resumo.total_juros|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Custo Total do Bem</h4>
+                            <p>{{ resultados.resumo.total_pago|currency }}</p>
+                        </div>
+                    </div>
+
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Mês</th>
+                                <th>Parcela Fixa</th>
+                                <th>Juros</th>
+                                <th>Amortização</th>
+                                <th>Saldo Devedor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for linha in resultados.mensal %}
+                            <tr>
+                                <td style="text-align: center;">{{ linha.mes }}</td>
+                                <td>{{ linha.parcela|currency }}</td>
+                                <td>{{ linha.juros|currency }}</td>
+                                <td>{{ linha.amortizacao|currency }}</td>
+                                <td>{{ linha.saldo_devedor|currency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

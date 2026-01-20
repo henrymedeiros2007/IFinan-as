@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Perfil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+              <div class="sidebar-header">
+                    <h3>{{ user_name }}</h3>
+                    <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+              </div>
+              <nav class="sidebar-nav">
+                    <ul>
+                          <li><a href="{{ url_for('perfil') }}" class="active">Perfil</a></li>
+                          <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                          <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                          <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                          <li><a href="{{ url_for('simulador') }}">Simulador</a></li>
+                          <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                    </ul>
+              </nav>
+              <div class="sidebar-footer">
+                    <a href="{{ url_for('logout') }}">Sair</a>
+              </div>
+        </aside>
+        <main class="main-content">
+            <div class="form-container-perfil">
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+
+                            <div class="flash {{ category }}" style="margin-bottom: 1rem;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="input-group-perfil">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" value="{{ user_name }}" required>
+                    </div>
+                    <div class="input-group-perfil">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" value="{{ user_email }}" required>
+                    </div>
+                    <div class="input-group-perfil">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="Nova Senha">
+                    </div>
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                </form>
+            </div>
+
+     
+            <div class="form-container-perfil excluir-secao" style="margin-top: 2rem;">
+
+                <h3 class="excluir-titulo">Excluir Conta</h3>
+
+                <p class="excluir-texto">A exclusão da sua conta é permanente e não pode ser desfeita.</p>
+
+                <button id="btn-excluir-abrir" class="btn-excluir-abrir">Excluir Minha Conta</button>
+            </div>
+            
+        </main>
+    </div>
+
+    <div id="modal-excluir" class="modal-overlay">
+        <div class="modal-content">
+            <h4>Tem certeza?</h4>
+            <p>Você está prestes a excluir permanentemente sua conta e todos os seus dados (receitas, despesas, metas, etc.).</p>
+            <p style="margin-bottom: 0.5rem;"><strong>Esta ação não pode ser desfeita.</strong></p>
+            
+            <div class="modal-botoes">
+                <button id="btn-excluir-cancelar" class="btn-cancelar">Cancelar</button>
+                <a href="{{ url_for('excluir_conta') }}" class="btn-excluir-confirmar">Sim, excluir minha conta</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal-excluir');
+        const abrirBtn = document.getElementById('btn-excluir-abrir');
+        const cancelarBtn = document.getElementById('btn-excluir-cancelar');
+
+        if(abrirBtn) {
+            abrirBtn.onclick = function() {
+                modal.style.display = 'block';
+            }
+        }
+
+        if(cancelarBtn) {
+            cancelarBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

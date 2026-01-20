@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>IFinanças - Metas Financeiras</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+                <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}" class="active">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages" style="margin-bottom: 1.5rem;">
+                  {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="form-container">
+                <h2>Criar nova meta financeira</h2>
+                <form action="{{ url_for('meta') }}" method="post">
+                    <div class="form-row">
+                        <input type="text" name="nome" placeholder="Nome da meta (Ex: Viagem, Carro novo)" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="number" step="0.01" name="valor_objetivo" placeholder="Valor do Objetivo (R$)" required>
+                        <input type="date" name="data_limite" required>
+                    </div>
+                    <button type="submit" class="btn-salvar-form">Salvar Nova Meta</button>
+                </form>
+            </div>
+
+      
+            <div class="form-container" style="margin-top: 2rem; background-color: #e0f5e6;">
+                <h2>Adicionar valor a uma meta</h2>
+
+              
+                {% if metas %}
+                    <form action="{{ url_for('adicionar_meta') }}" method="post">
+                        <div class="form-row">
+                            <select name="meta_id" required style="flex: 2;">
+                                <option value="" disabled selected>Selecione uma meta existente...</option>
+                                {% for meta in metas %}
+                                    <option value="{{ meta.id_meta }}">{{ meta.nome }}</option>
+                                {% endfor %}
+                            </select>
+                            
+                            <input type="number" step="0.01" name="valor_adicionar" placeholder="Valor a adicionar (R$)" required style="flex: 1;">
+                        </div>
+                        <button type="submit" class="btn-salvar-form" style="background-color: #4c997b;">Adicionar Valor</button>
+                    </form>
+                
+                {% else %}
+                <p style="text-align: center; color: var(--cor-verde-escuro);">
+                        Você ainda não criou nenhuma meta. 
+                        <br>
+                        Crie uma nova meta no formulário acima para poder adicionar valores a ela.
+                    </p>
+                {% endif %}
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

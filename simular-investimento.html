@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Simular Investimento</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; 
+            left: 50%;
+            margin-left: -110px; 
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .results-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f8f0; 
+            border-radius: 8px;
+        }
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-card h4 {
+            margin: 0 0 5px 0;
+            color: #555;
+        }
+        .summary-card p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e8b57; 
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+        .results-table th {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+        }
+        .results-table tr:nth-child(even){background-color: #f2f2f2;}
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+                <a href="{{ url_for('dashboard') }}" class="back-link">voltar ao início</a>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}" class="active">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="form-container">
+                <h2>Simular investimento</h2>
+                <form method="POST">
+                    <div class="invest-row">
+                        <div class="invest-group">
+                            <label>Tipo de investimento (Isenção de IR)</label>
+                            <div>
+                                <span class="tooltip">CDB/LC
+                                    <span class="tooltip-text">Certificado de Depósito Bancário / Letra de Câmbio. Possuem cobrança de Imposto de Renda.</span>
+                                </span>
+                                <span class="tooltip">LCI/LCA
+                                    <span class="tooltip-text">Letra de Crédito Imobiliário / Agronegócio. São isentos de Imposto de Renda para pessoa física.</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invest-group">
+                             <label>Tipo de Rentabilidade</label>
+                             <div>
+                                 <span class="tooltip">PRÉ
+                                     <span class="tooltip-text">Taxa de juros definida no momento da aplicação. Você sabe exatamente quanto receberá no vencimento.</span>
+                                 </span>
+                                 <span class="tooltip">PÓS
+                                     <span class="tooltip-text">Rentabilidade atrelada a um indicador, como a taxa CDI. O valor final varia conforme o indicador.</span>
+                                 </span>
+                                  <span class="tooltip">IPCA
+                                     <span class="tooltip-text">Rentabilidade atrelada à inflação (IPCA) mais uma taxa prefixada. Protege seu dinheiro da perda de poder de compra.</span>
+                                 </span>
+                             </div>
+                        </div>
+                    </div>
+                     <div class="form-row">
+                        <input type="number" name="investimento_inicial" placeholder="Investimento inicial (R$)" step="0.01" required>
+                        <input type="number" name="aporte_mensal" placeholder="Investimento mensal (R$)" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="number" name="rentabilidade" placeholder="Rentabilidade (ex: 13.65) % a.a" step="0.01" required>
+                        <input type="number" name="prazo" placeholder="Prazo (em meses)" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-calcular">Calcular</button>
+                        <button type="reset" class="btn-limpar">Limpar</button>
+                    </div>
+                </form>
+
+                {% if resultados %}
+                <div class="results-container">
+                    <h3>Resultado da Simulação</h3>
+                    <div class="results-summary">
+                        <div class="summary-card">
+                            <h4>Total Investido</h4>
+                            <p>{{ resultados.resumo.total_investido|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Valor Final Bruto</h4>
+                            <p>{{ resultados.resumo.valor_final_bruto|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Imposto de Renda</h4>
+                            <p>{{ resultados.resumo.total_imposto|currency }}</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Valor Final Líquido</h4>
+                            <p>{{ resultados.resumo.valor_final_liquido|currency }}</p>
+                        </div>
+                    </div>
+
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Mês</th>
+                                <th>Total Investido</th>
+                                <th>Montante Bruto</th>
+                                <th>Montante Líquido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for linha in resultados.mensal %}
+                            <tr>
+                                <td style="text-align: center;">{{ linha.mes }}</td>
+                                <td>{{ linha.total_investido|currency }}</td>
+                                <td>{{ linha.montante_bruto|currency }}</td>
+                                <td>{{ linha.montante_liquido|currency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

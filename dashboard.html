@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" style="z-index: 10;">
+            <div class="sidebar-header">
+                <h3>{{ user_name }}</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('upload') }}">↑ upload extrato mensal</a></li>
+                    <li><a href="{{ url_for('despesa') }}">$ Registrar despesa</a></li>
+                    <li><a href="{{ url_for('receita') }}">+ Registrar Receita</a></li>
+                    <li><a href="{{ url_for('simulador') }}">Simulador</a></li>
+                    <li><a href="{{ url_for('meta') }}">Metas Financeiras</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="dashboard-grid">
+                <div class="card saldo-card">
+                    <h4>Saldo Atual</h4>
+                    <p>R$ {{ saldo_atual if saldo_atual is not none else '0.00' }}</p>
+                </div>
+                <div class="card metas-card">
+                    <h4>Metas</h4>
+                    {% if metas %}
+                        <ul>
+                        {% for meta in metas %}
+                            <li>{{ meta.nome }} - R$ {{ meta.valor_atual if meta.valor_atual is not none else '0.00' }} / R$ {{ meta.valor_objetivo }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>Nenhuma meta cadastrada.</span>
+                    {% endif %}
+                </div>
+              
+                </div>
+                <div class="card grafico-card" style="position: relative; height:40vh">
+                    <h4>Gráfico Despesa x Receita</h4>
+                    <canvas id="graficoReceitaDespesa"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('graficoReceitaDespesa').getContext('2d');
+            
+            const totalReceitas = parseFloat("{{ total_receitas or 0 }}");
+            const totalDespesas = parseFloat("{{ total_despesas or 0 }}");
+
+            new Chart(ctx, {
+                type: 'bar', 
+                data: {
+                    labels: ['Transações'], 
+                    datasets: [{
+                        label: 'Receitas',
+                        data: [totalReceitas],
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Despesas',
+                        data: [totalDespesas],
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true 
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

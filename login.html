@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFinanças - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="split-container">
+        <div class="split-left">
+            <div class="logo-container">
+               <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo iFinanças">
+                <h1>IFinanças</h1>
+            </div>
+        </div>
+        <div class="split-right">
+            <div class="form-card">
+                <h2>Login</h2>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="{{ url_for('login') }}" method="post">
+                    <div class="input-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" required>
+                    </div>
+                    <button type="submit" class="btn">Entrar</button>
+                </form>
+                <div class="auth-footer">
+                    <a href="{{ url_for('cadastro') }}" class="link-cadastro">Primeiro acesso? Cadastre-se</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
